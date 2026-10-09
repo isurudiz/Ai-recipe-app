@@ -1,15 +1,11 @@
-import React, { useState, createContext, useContext, useId } from 'react';
+import React, { useState } from 'react';
 
-// Design Tokens defined as CSS variable constants
-export const DESIGN_TOKENS = {
+// Design tokens
+const DESIGN_TOKENS = {
   colors: {
     background: '#FFF9F2',
     primaryButton: '#E58B91',
     accent: '#DE8B87',
-    softPinkCard: '#F8E3E0',
-    lightPink: '#FAEBE7',
-    sagePanel: '#E9EFE3',
-    beigeCard: '#EFE5D8',
     text: '#474747',
   },
   typography: {
@@ -18,434 +14,138 @@ export const DESIGN_TOKENS = {
   },
 } as const;
 
-export type SupportedLanguage = 'en' | 'ru';
+type SupportedLanguage = 'en' | 'ru';
 
-// Embedded i18n dictionaries for zero-dependency reliability (Strictly typed, no 'any')
-export const translations = {
+// Bilingual translations
+const translations = {
   en: {
     topHeader: 'What should we cook today? ♡',
     headline: 'What should we cook\ntoday?',
-    subtitle: "Don't plan your whole life.\nJust decide what to cook today.",
-    buttons: {
-      russian: 'Russian',
-      english: 'English',
-    },
-    meta: {
-      imageAlt: 'Healthy grain bowl with sliced grilled chicken breast, quinoa, avocado, and roasted vegetables',
-      slideIndicator: '1/3',
-      languageChangedNotification: 'Language switched to English',
-    },
-    slides: [
-      {
-        id: 1,
-        title: 'What should we cook\ntoday?',
-        subtitle: "Don't plan your whole life.\nJust decide what to cook today.",
-        indicator: '1/3',
-        image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        id: 2,
-        title: 'Simple recipes with\nwhat you have',
-        subtitle: "Quick everyday meals crafted from\ningredients already in your pantry.",
-        indicator: '2/3',
-        image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        id: 3,
-        title: 'Fresh culinary ideas\nevery single day',
-        subtitle: "Healthy, delicious nutrition without\nthe daily dinner stress.",
-        indicator: '3/3',
-        image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1000&q=80',
-      },
-    ],
+    subtitle: 'Don’t plan your whole life.\nJust decide what to cook today.',
+    russianBtn: 'Russian',
+    englishBtn: 'English',
+    imageAlt: 'Healthy grain bowl with sliced grilled chicken breast, quinoa, avocado, and vegetables',
+    badge: '1/3',
   },
   ru: {
-    topHeader: 'Что приготовим сегодня? ♡',
-    headline: 'Что приготовим\nсегодня?',
+    topHeader: 'Что приготовить сегодня? ♡',
+    headline: 'Что приготовить\nсегодня?',
     subtitle: 'Не планируйте всю жизнь.\nПросто решите, что приготовить сегодня.',
-    buttons: {
-      russian: 'Russian',
-      english: 'English',
-    },
-    meta: {
-      imageAlt: 'Полезный боул с аппетитным куриным филе, киноа, авокадо и запеченными овощами',
-      slideIndicator: '1/3',
-      languageChangedNotification: 'Язык переключен на русский',
-    },
-    slides: [
-      {
-        id: 1,
-        title: 'Что приготовим\nсегодня?',
-        subtitle: 'Не планируйте всю жизнь.\nПросто решите, что приготовить сегодня.',
-        indicator: '1/3',
-        image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        id: 2,
-        title: 'Простые рецепты из\nтого, что есть',
-        subtitle: 'Быстрые и вкусные блюда на каждый день\nиз продуктов вашего холодильника.',
-        indicator: '2/3',
-        image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        id: 3,
-        title: 'Вдохновение на кухне\nкаждый день',
-        subtitle: 'Полезное и сбалансированное питание\nбез лишних хлопот и раздумий.',
-        indicator: '3/3',
-        image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1000&q=80',
-      },
-    ],
+    russianBtn: 'Русский',
+    englishBtn: 'English',
+    imageAlt: 'Полезное блюдо с куриной грудкой, киноа, авокадо и овощами',
+    badge: '1/3',
   },
 } as const;
 
-interface I18nContextType {
-  language: SupportedLanguage;
-  changeLanguage: (lang: SupportedLanguage) => void;
-  t: (key: 'topHeader' | 'headline' | 'subtitle' | 'buttons.russian' | 'buttons.english' | 'meta.slideIndicator' | 'meta.imageAlt') => string;
-}
+export default function App() {
+  const [lang, setLang] = useState<SupportedLanguage>('en');
+  const t = translations[lang];
 
-const I18nContext = createContext<I18nContextType | null>(null);
-
-export const useI18n = (): I18nContextType => {
-  const context = useContext(I18nContext);
-  if (!context) {
-    throw new Error('useI18n must be used within an I18nProvider');
-  }
-  return context;
-};
-
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost';
-  isActive?: boolean;
-  fullWidth?: boolean;
-  children: React.ReactNode;
-}
-
-export const Button: React.FC<ButtonProps> = ({
-  variant = 'secondary',
-  isActive = false,
-  fullWidth = false,
-  children,
-  className = '',
-  ...props
-}) => {
-  // Base button styles guaranteeing >= 44px height (48px applied), smooth transitions & visible focus rings
-  const baseStyles =
-    'relative min-h-[48px] px-5 py-3 rounded-2xl text-[15px] font-medium tracking-tight transition-all duration-200 ease-out select-none flex items-center justify-center text-center cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#DE8B87] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFF9F2] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none';
-
-  // Variant color mapping matching Figma design tokens
-  let variantStyles = '';
-  if (isActive || variant === 'primary') {
-    variantStyles = 'bg-[#E58B91] text-white shadow-[0_4px_14px_rgba(229,139,145,0.30)] hover:bg-[#DE8B87]';
-  } else {
-    variantStyles =
-      'bg-white text-[#474747] shadow-[0_2px_8px_rgba(0,0,0,0.03)] border border-[#EFE5D8]/50 hover:bg-[#FFFDF9] hover:border-[#DE8B87]/30';
-  }
-
-  const widthStyle = fullWidth ? 'w-full' : 'flex-1';
-
-  return (
-    <button
-      className={`${baseStyles} ${variantStyles} ${widthStyle} ${className}`}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-};
-
-interface CardProps {
-  children: React.ReactNode;
-  variant?: 'softPink' | 'lightPink' | 'sage' | 'beige' | 'background';
-  className?: string;
-}
-
-export const Card: React.FC<CardProps> = ({
-  children,
-  variant = 'background',
-  className = '',
-}) => {
-  const variantBg = {
-    softPink: 'bg-[#F8E3E0]',
-    lightPink: 'bg-[#FAEBE7]',
-    sage: 'bg-[#E9EFE3]',
-    beige: 'bg-[#EFE5D8]',
-    background: 'bg-[#FFF9F2]',
-  }[variant];
-
-  return (
-    <div className={`rounded-3xl ${variantBg} ${className}`}>
-      {children}
-    </div>
-  );
-};
-
-interface SlideBadgeProps {
-  label: string;
-}
-
-export const SlideBadge: React.FC<SlideBadgeProps> = ({ label }) => {
   return (
     <div
-      aria-label={`Slide ${label}`}
-      className="absolute bottom-3.5 right-3.5 px-3 py-1 bg-black/45 backdrop-blur-md rounded-full flex items-center justify-center text-white text-[12px] font-medium tracking-wider shadow-sm select-none"
+      className="min-h-screen w-full flex justify-center items-center px-4 py-8 select-none"
+      style={{
+        backgroundColor: DESIGN_TOKENS.colors.background,
+        color: DESIGN_TOKENS.colors.text,
+        fontFamily: DESIGN_TOKENS.typography.sans,
+      }}
     >
-      {label}
-    </div>
-  );
-};
-
-interface FoodWelcomeScreenProps {
-  activeLanguage: SupportedLanguage;
-  onSelectLanguage: (lang: SupportedLanguage) => void;
-}
-
-export const FoodWelcomeScreen: React.FC<FoodWelcomeScreenProps> = ({
-  activeLanguage,
-  onSelectLanguage,
-}) => {
-  const { t } = useI18n();
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-
-  // Active slide data from language resource
-  const slides = translations[activeLanguage].slides;
-  const currentSlide = slides[currentSlideIndex] || slides[0];
-
-  // Handlers for optional slide interaction
-  const handleNextSlide = () => {
-    setCurrentSlideIndex((prev) => (prev + 1) % slides.length);
-  };
-
-  const handlePrevSlide = () => {
-    setCurrentSlideIndex((prev) => (prev - 1 + slides.length) % slides.length);
-  };
-
-  // Mock handlers marked with TODO as requested
-  const handleRussianClick = () => {
-    // TODO: Persist user language preference to API / remote user session
-    // TODO: Track analytics event for onboarding language change
-    onSelectLanguage('ru');
-  };
-
-  const handleEnglishClick = () => {
-    // TODO: Persist user language preference to API / remote user session
-    // TODO: Track analytics event for onboarding language change
-    onSelectLanguage('en');
-  };
-
-  return (
-    <div className="w-full max-w-[390px] mx-auto min-h-[820px] bg-[#FFF9F2] text-[#474747] px-5 pt-8 pb-10 flex flex-col justify-between font-sans relative select-none">
-      {/* Top Header Label in accent color #DE8B87 */}
-      <header className="w-full flex items-center justify-center pt-2 pb-4">
-        <h2 className="text-[#DE8B87] text-[13.5px] font-medium tracking-normal text-center">
-          {t('topHeader')}
-        </h2>
-      </header>
-
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col justify-start">
-        {/* Hero Image Container with custom rounded corners matching Figma */}
-        <div className="relative w-full aspect-[1.18/1] rounded-[26px] overflow-hidden shadow-[0_10px_25px_rgba(71,71,71,0.06)] bg-[#EFE5D8]/40 border border-[#EFE5D8]/40 group">
-          <img
-            src={currentSlide.image}
-            alt={t('meta.imageAlt')}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
-            loading="eager"
-          />
-
-          {/* 1/3 Pill Indicator badge */}
-          <SlideBadge label={currentSlide.indicator} />
-
-          {/* Subtle touch navigation overlays for interactive slide preview */}
-          <button
-            onClick={handlePrevSlide}
-            aria-label="Previous slide"
-            className="absolute left-0 top-0 bottom-0 w-1/4 opacity-0 cursor-pointer"
-          />
-          <button
-            onClick={handleNextSlide}
-            aria-label="Next slide"
-            className="absolute right-0 top-0 bottom-0 w-1/4 opacity-0 cursor-pointer"
-          />
-        </div>
-
-        {/* Headings & Subtitle Section */}
-        <div className="pt-6 pb-2">
-          {/* Serif Heading in #474747 */}
-          <h1 className="font-serif text-[32px] sm:text-[34px] leading-[1.15] font-bold text-[#474747] tracking-[-0.015em] whitespace-pre-line">
-            {currentSlide.title}
-          </h1>
-
-          {/* Subtitle in #474747 */}
-          <p className="mt-3.5 text-[14.5px] sm:text-[15px] leading-[1.38] text-[#474747]/90 font-normal whitespace-pre-line">
-            {currentSlide.subtitle}
+      {/* Centered content column (mobile-sized card container without phone borders) */}
+      <main className="w-full max-w-[390px] min-h-[760px] flex flex-col justify-between mx-auto">
+        {/* Top Header */}
+        <header className="pt-2 pb-2 text-center">
+          <p
+            className="text-[14px] font-medium tracking-wide"
+            style={{
+              color: DESIGN_TOKENS.colors.accent,
+              fontFamily: DESIGN_TOKENS.typography.sans,
+            }}
+          >
+            {t.topHeader}
           </p>
-        </div>
-
-        {/* Language Selection Buttons (Two Pills: Russian & English) */}
-        <div className="mt-4 flex items-center gap-3 w-full">
-          {/* Russian Button */}
-          <Button
-            isActive={activeLanguage === 'ru'}
-            onClick={handleRussianClick}
-            aria-label="Select Russian Language"
-          >
-            {t('buttons.russian')}
-          </Button>
-
-          {/* English Button */}
-          <Button
-            isActive={activeLanguage === 'en'}
-            onClick={handleEnglishClick}
-            aria-label="Select English Language"
-          >
-            {t('buttons.english')}
-          </Button>
-        </div>
-      </main>
-
-      {/* Subtle bottom spacing bar to mirror mobile safe-area spacing */}
-      <footer className="w-full pt-4 flex items-center justify-center">
-        <div className="w-32 h-1 bg-[#474747]/10 rounded-full" />
-      </footer>
-    </div>
-  );
-};
-
-export default function App() {
-  const [language, setLanguage] = useState<SupportedLanguage>('en');
-  const [showPhoneFrame, setShowPhoneFrame] = useState(true);
-
-  // i18n lookup utility
-  const t = (
-    key:
-      | 'topHeader'
-      | 'headline'
-      | 'subtitle'
-      | 'buttons.russian'
-      | 'buttons.english'
-      | 'meta.slideIndicator'
-      | 'meta.imageAlt'
-  ): string => {
-    const dict = translations[language];
-    switch (key) {
-      case 'topHeader':
-        return dict.topHeader;
-      case 'headline':
-        return dict.headline;
-      case 'subtitle':
-        return dict.subtitle;
-      case 'buttons.russian':
-        return dict.buttons.russian;
-      case 'buttons.english':
-        return dict.buttons.english;
-      case 'meta.slideIndicator':
-        return dict.meta.slideIndicator;
-      case 'meta.imageAlt':
-        return dict.meta.imageAlt;
-      default:
-        return '';
-    }
-  };
-
-  const contextValue: I18nContextType = {
-    language,
-    changeLanguage: setLanguage,
-    t,
-  };
-
-  return (
-    <I18nContext.Provider value={contextValue}>
-      {/* Dynamic Google Fonts injection for Playfair Display & Inter */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&display=swap');
-        
-        :root {
-          --bg-screen: ${DESIGN_TOKENS.colors.background};
-          --btn-primary: ${DESIGN_TOKENS.colors.primaryButton};
-          --accent-pink: ${DESIGN_TOKENS.colors.accent};
-          --card-soft-pink: ${DESIGN_TOKENS.colors.softPinkCard};
-          --card-light-pink: ${DESIGN_TOKENS.colors.lightPink};
-          --panel-sage: ${DESIGN_TOKENS.colors.sagePanel};
-          --card-beige: ${DESIGN_TOKENS.colors.beigeCard};
-          --text-primary: ${DESIGN_TOKENS.colors.text};
-        }
-
-        .font-serif {
-          font-family: 'Playfair Display', Georgia, Cambria, serif;
-        }
-
-        .font-sans {
-          font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        }
-      `}</style>
-
-      <div className="min-h-screen bg-[#1F1F23] flex flex-col items-center justify-center p-3 sm:p-6 md:p-8">
-        {/* Top Control Bar for preview inspection */}
-        <header className="mb-4 flex flex-wrap items-center justify-between gap-3 max-w-[390px] w-full px-2 text-xs text-[#EFE5D8]">
-          <div className="flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-[#E58B91] animate-pulse" />
-            <span className="font-medium tracking-wide">Figma Spec Mode (390px)</span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowPhoneFrame(!showPhoneFrame)}
-              className="px-2.5 py-1 rounded-md bg-[#2B2B30] hover:bg-[#383840] text-[#FFF9F2] transition text-[11px] font-medium border border-white/10 cursor-pointer"
-            >
-              {showPhoneFrame ? 'Hide Frame' : 'Show Frame'}
-            </button>
-            <span className="text-white/40">|</span>
-            <span className="font-semibold uppercase tracking-wider text-[#E58B91]">
-              {language}
-            </span>
-          </div>
         </header>
 
-        {/* Mobile Device Mockup Frame */}
-        <div
-          className={`relative transition-all duration-300 ${
-            showPhoneFrame
-              ? 'rounded-[46px] p-[10px] bg-black shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.1)] border-[4px] border-[#2E2E32]'
-              : 'rounded-[32px] overflow-hidden shadow-2xl'
-          }`}
-        >
-          {/* Hardware notch / speaker speaker simulation for realistic frame view */}
-          {showPhoneFrame && (
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 w-28 h-4 bg-black rounded-full z-30 pointer-events-none flex items-center justify-center">
-              <div className="w-10 h-1 bg-[#1a1a1a] rounded-full" />
-              <div className="w-2.5 h-2.5 bg-[#121214] rounded-full ml-2 border border-white/10" />
-            </div>
-          )}
-
-          {/* Screen Content Wrapper */}
-          <div className="rounded-[36px] overflow-hidden bg-[#FFF9F2]">
-            <FoodWelcomeScreen
-              activeLanguage={language}
-              onSelectLanguage={(lang) => setLanguage(lang)}
+        {/* Hero Image & Headline Area */}
+        <section className="flex-1 flex flex-col justify-center my-auto space-y-6">
+          {/* Meal Photo */}
+          <div className="relative w-full aspect-[1/0.92] rounded-[32px] overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.06)]">
+            <img
+              src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80"
+              alt={t.imageAlt}
+              className="w-full h-full object-cover"
             />
+            <span className="absolute bottom-3 right-3 bg-black/45 backdrop-blur-sm text-white text-[11px] font-medium px-2.5 py-1 rounded-full tracking-wider">
+              {t.badge}
+            </span>
           </div>
-        </div>
 
-        {/* Design Token Reference Panel */}
-        <footer className="mt-6 max-w-[390px] w-full px-3 py-3 bg-[#26262B] rounded-2xl border border-white/5 text-[11px] text-[#EFE5D8]/80 flex flex-col gap-1.5">
-          <div className="flex items-center justify-between">
-            <span className="text-white/60">Active Theme Tokens</span>
-            <span className="font-mono text-[10px] text-[#E58B91]">#FFF9F2 / #E58B91</span>
+          {/* Typography */}
+          <div className="space-y-3 px-1">
+            <h1
+              className="text-[38px] leading-[1.12] font-bold tracking-tight whitespace-pre-line"
+              style={{
+                fontFamily: DESIGN_TOKENS.typography.serif,
+                color: DESIGN_TOKENS.colors.text,
+              }}
+            >
+              {t.headline}
+            </h1>
+            <p
+              className="text-[15px] leading-relaxed whitespace-pre-line opacity-85"
+              style={{
+                fontFamily: DESIGN_TOKENS.typography.sans,
+                color: DESIGN_TOKENS.colors.text,
+              }}
+            >
+              {t.subtitle}
+            </p>
           </div>
-          <div className="flex items-center gap-1.5 pt-1">
-            <div className="w-4 h-4 rounded-full bg-[#FFF9F2] border border-black/10" title="Background #FFF9F2" />
-            <div className="w-4 h-4 rounded-full bg-[#E58B91]" title="Primary #E58B91" />
-            <div className="w-4 h-4 rounded-full bg-[#DE8B87]" title="Accent #DE8B87" />
-            <div className="w-4 h-4 rounded-full bg-[#F8E3E0]" title="Soft Pink #F8E3E0" />
-            <div className="w-4 h-4 rounded-full bg-[#FAEBE7]" title="Light Pink #FAEBE7" />
-            <div className="w-4 h-4 rounded-full bg-[#E9EFE3]" title="Sage #E9EFE3" />
-            <div className="w-4 h-4 rounded-full bg-[#EFE5D8]" title="Beige #EFE5D8" />
-            <div className="w-4 h-4 rounded-full bg-[#474747]" title="Text #474747" />
-            <span className="ml-auto text-[10px] text-white/50">Touch image to preview slides</span>
+        </section>
+
+        {/* Language Selection Buttons */}
+        <footer className="pt-4 pb-2">
+          <div className="grid grid-cols-2 gap-3.5">
+            <button
+              type="button"
+              onClick={() => setLang('ru')}
+              aria-label="Switch language to Russian"
+              className="min-h-[48px] px-5 py-2.5 rounded-2xl text-[15px] font-medium transition-all duration-200 outline-none flex items-center justify-center text-center shadow-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-offset-2"
+              style={{
+                backgroundColor:
+                  lang === 'ru'
+                    ? DESIGN_TOKENS.colors.primaryButton
+                    : '#FFFFFF',
+                color:
+                  lang === 'ru'
+                    ? '#FFFFFF'
+                    : DESIGN_TOKENS.colors.text,
+              }}
+            >
+              {t.russianBtn}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setLang('en')}
+              aria-label="Switch language to English"
+              className="min-h-[48px] px-5 py-2.5 rounded-2xl text-[15px] font-medium transition-all duration-200 outline-none flex items-center justify-center text-center shadow-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-offset-2"
+              style={{
+                backgroundColor:
+                  lang === 'en'
+                    ? DESIGN_TOKENS.colors.primaryButton
+                    : '#FFFFFF',
+                color:
+                  lang === 'en'
+                    ? '#FFFFFF'
+                    : DESIGN_TOKENS.colors.text,
+              }}
+            >
+              {t.englishBtn}
+            </button>
           </div>
         </footer>
-      </div>
-    </I18nContext.Provider>
+      </main>
+    </div>
   );
 }

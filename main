@@ -6,7 +6,16 @@ const DESIGN_TOKENS = {
     background: '#FFF9F2',
     primaryButton: '#E58B91',
     accent: '#DE8B87',
+    softPinkCard: '#F8E3E0',
+    lightPink: '#FAEBE7',
+    sagePanel: '#E9EFE3',
+    beigeCard: '#EFE5D8',
     text: '#474747',
+    textMuted: '#7A7A7A',
+    errorRed: '#CF4343',
+    sageTextTitle: '#3B4A37',
+    sageTextBody: '#556650',
+    white: '#FFFFFF',
   },
   typography: {
     serif: "'Playfair Display', Georgia, Cambria, 'Times New Roman', serif",
@@ -15,137 +24,2038 @@ const DESIGN_TOKENS = {
 } as const;
 
 type SupportedLanguage = 'en' | 'ru';
+type Screen =
+  | 'welcome'
+  | 'signup'
+  | 'signin'
+  | 'forgot'
+  | 'allergies'
+  | 'today'
+  | 'whatToCook'
+  | 'fitMacros'
+  | 'dessert'
+  | 'surprise'
+  | 'everydayMeals';
 
-// Bilingual translations
+type TabType = 'home' | 'favorites' | 'history' | 'me';
+
+const MOCK_EXISTING_USER = {
+  email: 'alex@example.com',
+  password: 'Password123',
+};
+
+// Complete Bilingual Dictionaries
 const translations = {
   en: {
-    topHeader: 'What should we cook today? ♡',
-    headline: 'What should we cook\ntoday?',
-    subtitle: 'Don’t plan your whole life.\nJust decide what to cook today.',
-    russianBtn: 'Russian',
-    englishBtn: 'English',
-    imageAlt: 'Healthy grain bowl with sliced grilled chicken breast, quinoa, avocado, and vegetables',
-    badge: '1/3',
+    welcome: {
+      topHeader: 'What should we cook today? ♡',
+      headline: 'What should we cook\ntoday?',
+      subtitle: "Don't plan your whole life.\nJust decide what to cook today.",
+      russianBtn: 'Russian',
+      englishBtn: 'English',
+      imageAlt: 'Nutritious meal bowl with grilled chicken, avocado, and vegetables',
+      badge: '1/3',
+    },
+    nav: {
+      signupTitle: 'Create account',
+      signinTitle: 'Log in',
+      forgotTitle: 'Reset password',
+      allergiesTitle: 'Allergies & exclusions',
+      todayTitle: 'Today',
+      whatToCookTitle: 'What to cook',
+      fitMacrosTitle: 'Fit my macros',
+      dessertTitle: 'I want dessert',
+      surpriseTitle: 'Surprise me',
+      everydayMealsTitle: 'Everyday meals',
+    },
+    signup: {
+      title: 'Create your account',
+      subtitle: 'Save your preferences, favorites and history across devices.',
+      emailPlaceholder: 'Email',
+      passwordPlaceholder: 'Account password',
+      submitBtn: 'Create account',
+      alreadyRegistered: 'Already registered? Log in',
+      demoHint: 'Tip: Type alex@example.com to trigger the registered email popup.',
+    },
+    signin: {
+      title: 'Log in to your account',
+      subtitle: 'Access your preferences, favorites and history across devices.',
+      emailPlaceholder: 'Email',
+      passwordPlaceholder: 'Account password',
+      submitBtn: 'Log in',
+      noAccount: "Don't have an account? Sign up",
+      forgotPasswordLink: 'Forgot password or link expired?',
+    },
+    forgot: {
+      title: 'Reset password',
+      subtitle: 'We sent a verification link to your email.',
+      linkInputPlaceholder: 'Reset token (type "expired")',
+      verifyBtn: 'Verify link',
+      testExpiredHint: 'Type "expired" to trigger the expired link popup.',
+    },
+    allergies: {
+      headline: 'What must never\nappear?',
+      subtitle: "We'll save this once and AI will exclude it automatically.",
+      customLabel: 'Another ingredient',
+      customPlaceholder: 'e.g. sesame, avocado, strawberries...',
+      sageTitle: 'Hidden ingredients matter too',
+      sageDescription:
+        'If a sauce or packaged product may contain an allergen, AI should flag it instead of guessing.',
+      saveBtn: 'Save preferences',
+      noAllergiesPrompt:
+        'We use this to keep your recipes safe. Do you have no allergies or exclusions?',
+      yesNoneBtn: 'Yes, none',
+      goBackBtn: 'Go back',
+      tags: {
+        dairy: 'Dairy',
+        gluten: 'Gluten',
+        nuts: 'Nuts',
+        eggs: 'Eggs',
+        soy: 'Soy',
+        fish: 'Fish / shellfish',
+      },
+    },
+    today: {
+      greeting: 'Hi',
+      headline: 'What are we cooking?',
+      subheadline: 'Fast, tasty, no overthinking.',
+      cards: {
+        whatToCook: 'What to cook',
+        whatToCookDesc: 'Show what you have at home',
+        fitMacros: 'Fit my macros',
+        fitMacrosDesc: 'Build it around your goals',
+        dessert: 'I want dessert',
+        dessertDesc: 'Without the “diet” feeling',
+        surprise: 'Surprise me',
+        surpriseDesc: 'Something new',
+      },
+      banner: {
+        title: 'Everyday meals',
+        subtitle: "When you don't want to think — just show me ideas.",
+      },
+      bottomCards: {
+        worthKnowing: 'Worth knowing',
+        worthKnowingSub: 'Tips + AI',
+        proRecipes: 'PRO recipes',
+        proRecipesSub: 'By Angelina',
+      },
+      tabs: {
+        home: 'Home',
+        favorites: 'Favorites',
+        history: 'History',
+        me: 'Me',
+      },
+    },
+    whatToCook: {
+      headline: "What's in your kitchen?",
+      subtitle: 'No perfect prompt needed. Just show or tell me what you have — AI handles the rest.',
+      tabs: { photo: 'Photo', type: 'Type', voice: 'Voice' },
+      photoCard: {
+        title: 'Take a photo of what you have',
+        desc: 'Fridge, counter or individual ingredients',
+      },
+      leftoversCard: {
+        title: 'Give leftovers a second life',
+        desc: "Yesterday's rice, pasta or meat → make it again",
+      },
+      quickPreferences: 'Quick preferences',
+      tags: {
+        protein: 'Protein +',
+        upTo15: 'Up to 15 min',
+        dairyFree: 'Dairy-free',
+      },
+      nextBtn: 'Next: refine preferences',
+      footnote: 'Then AI will build 3 options from your actual ingredients.',
+    },
+    fitMacros: {
+      headline: 'Do you know your daily targets?',
+      subtitle: 'Keep it simple — use your own numbers or let the app estimate a starting point.',
+      option1: {
+        title: 'Yes — I know my targets',
+        desc: 'Use my calories and macros',
+      },
+      option2: {
+        title: 'No — calculate them for me',
+        desc: 'Age, height, weight, activity & goal',
+      },
+      continueBtn: 'Continue',
+    },
+    dessert: {
+      headline: 'What sounds good?',
+      subtitle: 'A real dessert that can still fit your plan.',
+      tags: {
+        chocolate: 'Chocolate',
+        withBerries: 'With berries',
+        sugarFree: 'Sugar-free',
+        dairyFree: 'Dairy-free',
+        highProtein: 'High protein',
+        upTo250: 'Up to 250 kcal',
+      },
+      showBtn: 'Show desserts',
+    },
+    surprise: {
+      headline: "What's the mood today?",
+      subtitle: 'No long prompts. Just choose the feeling.',
+      options: [
+        'I want something new',
+        'Comfort food',
+        '☕ Something light',
+        '◎ Something filling',
+      ],
+      surpriseBtn: 'Surprise me',
+    },
+    everydayMeals: {
+      headline: 'Just give me ideas',
+      subtitle: "For days when you don't even want to list ingredients.",
+      meals: {
+        breakfast: 'Breakfast',
+        lunch: 'Lunch',
+        dinner: 'Dinner',
+        snack: 'Snack',
+      },
+      filters: {
+        balanced: '🥗 Simple & balanced',
+        quick: '⚡ Up to 20 min',
+        family: '◎ Family-friendly',
+      },
+      showBtn: 'Show ideas',
+    },
+    errors: {
+      noticeTitle: 'Notice',
+      wrongLogin: 'Incorrect email or password.',
+      emailRegistered: 'This email is already registered.',
+      signInAction: 'Sign in',
+      invalidEmail: 'Enter a valid email address.',
+      shortPassword: 'Use at least 8 characters.',
+      expiredReset: 'This link has expired.',
+      sendNewLinkAction: 'Send a new link',
+      okBtn: 'Got it',
+    },
+    modal: {
+      savedTitle: 'Preferences saved!',
+      savedDesc: 'Your dietary filters and exclusions are now actively applied to AI meal generation.',
+      continueBtn: 'Continue to recipes',
+      linkSentTitle: 'New link sent',
+      linkSentDesc: 'A fresh recovery link has been dispatched to your email address.',
+    },
   },
   ru: {
-    topHeader: 'Что приготовить сегодня? ♡',
-    headline: 'Что приготовить\nсегодня?',
-    subtitle: 'Не планируйте всю жизнь.\nПросто решите, что приготовить сегодня.',
-    russianBtn: 'Русский',
-    englishBtn: 'English',
-    imageAlt: 'Полезное блюдо с куриной грудкой, киноа, авокадо и овощами',
-    badge: '1/3',
+    welcome: {
+      topHeader: 'Что приготовить сегодня? ♡',
+      headline: 'Что приготовить\nсегодня?',
+      subtitle: 'Не планируйте всю жизнь.\nПросто решите, что приготовить сегодня.',
+      russianBtn: 'Русский',
+      englishBtn: 'English',
+      imageAlt: 'Полезное блюдо с куриной грудкой, киноа и авокадо',
+      badge: '1/3',
+    },
+    nav: {
+      signupTitle: 'Создание аккаунта',
+      signinTitle: 'Вход в аккаунт',
+      forgotTitle: 'Сброс пароля',
+      allergiesTitle: 'Аллергии и исключения',
+      todayTitle: 'Сегодня',
+      whatToCookTitle: 'Что приготовить',
+      fitMacrosTitle: 'Попасть в КБЖУ',
+      dessertTitle: 'Хочу десерт',
+      surpriseTitle: 'Удиви меня',
+      everydayMealsTitle: 'Блюда на каждый день',
+    },
+    signup: {
+      title: 'Создайте аккаунт',
+      subtitle: 'Сохраняйте свои предпочтения, избранное и историю на всех устройствах.',
+      emailPlaceholder: 'Email',
+      passwordPlaceholder: 'Пароль аккаунта',
+      submitBtn: 'Создать аккаунт',
+      alreadyRegistered: 'Уже зарегистрированы? Войти',
+      demoHint: 'Совет: Введите alex@example.com, чтобы проверить всплывающее окно.',
+    },
+    signin: {
+      title: 'Войдите в аккаунт',
+      subtitle: 'Доступ к вашим предпочтениям, избранному и истории на любых устройствах.',
+      emailPlaceholder: 'Email',
+      passwordPlaceholder: 'Пароль аккаунта',
+      submitBtn: 'Войти',
+      noAccount: 'Нет аккаунта? Зарегистрироваться',
+      forgotPasswordLink: 'Забыли пароль или ссылка устарела?',
+    },
+    forgot: {
+      title: 'Сброс пароля',
+      subtitle: 'Мы отправили ссылку для подтверждения на вашу почту.',
+      linkInputPlaceholder: 'Токен ссылки (введите "expired")',
+      verifyBtn: 'Проверить ссылку',
+      testExpiredHint: 'Введите "expired", чтобы проверить окно устаревшей ссылки.',
+    },
+    allergies: {
+      headline: 'Что никогда не должно\nпоявляться?',
+      subtitle: 'Мы сохраним это один раз, и ИИ будет исключать это автоматически.',
+      customLabel: 'Другой ингредиент',
+      customPlaceholder: 'напр., кунжут, авокадо, клубника...',
+      sageTitle: 'Скрытые ингредиенты тоже важны',
+      sageDescription:
+        'Если соус или упакованный продукт может содержать аллерген, ИИ отметит это вместо догадок.',
+      saveBtn: 'Сохранить настройки',
+      noAllergiesPrompt:
+        'Мы используем это для безопасности ваших рецептов. У вас точно нет аллергий или исключений?',
+      yesNoneBtn: 'Да, нет аллергий',
+      goBackBtn: 'Вернуться назад',
+      tags: {
+        dairy: 'Молочные продукты',
+        gluten: 'Глютен',
+        nuts: 'Орехи',
+        eggs: 'Яйца',
+        soy: 'Соя',
+        fish: 'Рыба / морепродукты',
+      },
+    },
+    today: {
+      greeting: 'Привет',
+      headline: 'Что готовим?',
+      subheadline: 'Быстро, вкусно, без лишних мыслей.',
+      cards: {
+        whatToCook: 'Что приготовить',
+        whatToCookDesc: 'Покажите, что есть дома',
+        fitMacros: 'Попасть в КБЖУ',
+        fitMacrosDesc: 'Подстройте под свои цели',
+        dessert: 'Хочу десерт',
+        dessertDesc: 'Без ощущения «диеты»',
+        surprise: 'Удиви меня',
+        surpriseDesc: 'Что-то новенькое',
+      },
+      banner: {
+        title: 'Блюда на каждый день',
+        subtitle: 'Когда не хочется думать — просто покажи идеи.',
+      },
+      bottomCards: {
+        worthKnowing: 'Полезно знать',
+        worthKnowingSub: 'Советы + ИИ',
+        proRecipes: 'PRO рецепты',
+        proRecipesSub: 'От Ангелины',
+      },
+      tabs: {
+        home: 'Главная',
+        favorites: 'Избранное',
+        history: 'История',
+        me: 'Профиль',
+      },
+    },
+    whatToCook: {
+      headline: 'Что есть на кухне?',
+      subtitle: 'Не нужен идеальный запрос. Просто покажите или расскажите, что у вас есть — ИИ сделает остальное.',
+      tabs: { photo: 'Фото', type: 'Текст', voice: 'Голос' },
+      photoCard: {
+        title: 'Сделайте фото того, что есть',
+        desc: 'Холодильник, стол или отдельные продукты',
+      },
+      leftoversCard: {
+        title: 'Вторая жизнь остатков',
+        desc: 'Вчерашний рис, паста или мясо → готовим заново',
+      },
+      quickPreferences: 'Быстрые настройки',
+      tags: {
+        protein: 'Белок +',
+        upTo15: 'До 15 мин',
+        dairyFree: 'Без молока',
+      },
+      nextBtn: 'Далее: уточнить детали',
+      footnote: 'Затем ИИ предложит 3 варианта из ваших продуктов.',
+    },
+    fitMacros: {
+      headline: 'Знаете свою суточную норму?',
+      subtitle: 'Все просто — используйте свои цифры или позвольте приложению рассчитать их.',
+      option1: {
+        title: 'Да — я знаю свои нормы',
+        desc: 'Использовать мои калории и КБЖУ',
+      },
+      option2: {
+        title: 'Нет — рассчитайте для меня',
+        desc: 'Возраст, рост, вес, активность и цель',
+      },
+      continueBtn: 'Продолжить',
+    },
+    dessert: {
+      headline: 'Чего хочется сейчас?',
+      subtitle: 'Настоящий десерт, который впишется в ваш план питания.',
+      tags: {
+        chocolate: 'Шоколадный',
+        withBerries: 'С ягодами',
+        sugarFree: 'Без сахара',
+        dairyFree: 'Без молока',
+        highProtein: 'Высокобелковый',
+        upTo250: 'До 250 ккал',
+      },
+      showBtn: 'Показать десерты',
+    },
+    surprise: {
+      headline: 'Какое настроение сегодня?',
+      subtitle: 'Без долгих описаний. Просто выберите ощущение.',
+      options: [
+        'Хочу что-то новенькое',
+        'Комфортная еда',
+        '☕ Что-то легкое',
+        '◎ Что-то сытное',
+      ],
+      surpriseBtn: 'Удиви меня',
+    },
+    everydayMeals: {
+      headline: 'Просто покажи идеи',
+      subtitle: 'Для дней, когда не хочется даже перечислять ингредиенты.',
+      meals: {
+        breakfast: 'Завтрак',
+        lunch: 'Обед',
+        dinner: 'Ужин',
+        snack: 'Перекус',
+      },
+      filters: {
+        balanced: '🥗 Просто и сбалансированно',
+        quick: '⚡ До 20 мин',
+        family: '◎ Для всей семьи',
+      },
+      showBtn: 'Показать идеи',
+    },
+    errors: {
+      noticeTitle: 'Внимание',
+      wrongLogin: 'Неверный адрес эл. почты или пароль.',
+      emailRegistered: 'Этот email уже зарегистрирован.',
+      signInAction: 'Войти',
+      invalidEmail: 'Введите корректный адрес эл. почты.',
+      shortPassword: 'Используйте не менее 8 символов.',
+      expiredReset: 'Срок действия ссылки истек.',
+      sendNewLinkAction: 'Отправить новую ссылку',
+      okBtn: 'Понятно',
+    },
+    modal: {
+      savedTitle: 'Настройки сохранены!',
+      savedDesc: 'Ваши пищевые фильтры и исключения успешно применены к генерации рецептов.',
+      continueBtn: 'Перейти к рецептам',
+      linkSentTitle: 'Новая ссылка отправлена',
+      linkSentDesc: 'Новая ссылка для восстановления была отправлена на ваш почтовый ящик.',
+    },
   },
 } as const;
 
-export default function App() {
-  const [lang, setLang] = useState<SupportedLanguage>('en');
-  const t = translations[lang];
+// Reusable Top Navigation Bar with Back & Home icon
+function TopNavBar({
+  title,
+  lang,
+  onBack,
+  onHome,
+  onToggleLang,
+}: {
+  title: string;
+  lang: SupportedLanguage;
+  onBack?: () => void;
+  onHome?: () => void;
+  onToggleLang: () => void;
+}) {
+  return (
+    <header className="w-full flex items-center justify-between py-2 select-none">
+      <div className="w-10">
+        {onBack && (
+          <button
+            type="button"
+            onClick={onBack}
+            aria-label="Go back"
+            className="w-10 h-10 flex items-center justify-center -ml-2 rounded-full hover:bg-black/5 active:scale-95 transition-all text-[#474747]"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="19" y1="12" x2="5" y2="12" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
+          </button>
+        )}
+      </div>
+
+      <h2
+        className="text-[15px] font-semibold tracking-tight text-center truncate px-2 text-[#474747]"
+        style={{ fontFamily: DESIGN_TOKENS.typography.sans }}
+      >
+        {title}
+      </h2>
+
+      <div className="flex items-center gap-1.5">
+        <button
+          type="button"
+          onClick={onToggleLang}
+          aria-label="Toggle language"
+          className="min-w-[38px] h-[30px] px-2.5 rounded-full bg-white border border-[#E9DFD3] text-[11px] font-semibold tracking-wider flex items-center justify-center shadow-2xs hover:border-[#DE8B87] active:scale-95 transition-all uppercase text-[#474747]"
+          style={{ fontFamily: DESIGN_TOKENS.typography.sans }}
+        >
+          {lang === 'en' ? 'RU' : 'EN'}
+        </button>
+
+        {onHome && (
+          <button
+            type="button"
+            onClick={onHome}
+            aria-label="Go to Home"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-[#DE8B87] hover:bg-black/5 active:scale-90 transition-all"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            </svg>
+          </button>
+        )}
+      </div>
+    </header>
+  );
+}
+
+// Reusable Button
+function Button({
+  variant = 'primary',
+  children,
+  className = '',
+  onClick,
+}: {
+  variant?: 'primary' | 'secondary';
+  children: React.ReactNode;
+  className?: string;
+  onClick?: () => void;
+}) {
+  const isPrimary = variant === 'primary';
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`w-full min-h-[50px] px-6 py-3 rounded-[20px] text-[15px] font-medium transition-all duration-200 outline-none flex items-center justify-center text-center shadow-sm active:scale-[0.98] ${className}`}
+      style={{
+        backgroundColor: isPrimary ? DESIGN_TOKENS.colors.primaryButton : DESIGN_TOKENS.colors.white,
+        color: isPrimary ? DESIGN_TOKENS.colors.white : DESIGN_TOKENS.colors.text,
+        fontFamily: DESIGN_TOKENS.typography.sans,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+// Reusable Input
+function Input({
+  label,
+  value,
+  onChange,
+  type = 'text',
+}: {
+  label: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  type?: string;
+}) {
+  return (
+    <div className="w-full p-0.5">
+      <input
+        type={type}
+        aria-label={label}
+        placeholder={label}
+        value={value}
+        onChange={onChange}
+        className="w-full min-h-[52px] px-5 py-3 rounded-[20px] bg-white text-center text-[15px] transition-all outline-none border border-transparent shadow-xs placeholder:text-[#7A7A7A] focus:border-[#DE8B87]"
+        style={{
+          color: DESIGN_TOKENS.colors.text,
+          fontFamily: DESIGN_TOKENS.typography.sans,
+        }}
+      />
+    </div>
+  );
+}
+
+// Themed Popup Dialog
+function ThemedPopup({
+  isOpen,
+  isError,
+  title,
+  message,
+  primaryButtonText,
+  onPrimaryClick,
+  secondaryButtonText,
+  onSecondaryClick,
+}: {
+  isOpen: boolean;
+  isError: boolean;
+  title?: string;
+  message: string;
+  primaryButtonText: string;
+  onPrimaryClick: () => void;
+  secondaryButtonText?: string;
+  onSecondaryClick?: () => void;
+}) {
+  if (!isOpen) return null;
 
   return (
     <div
-      className="min-h-screen w-full flex justify-center items-center px-4 py-8 select-none"
+      role="alertdialog"
+      aria-modal="true"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/45 backdrop-blur-xs"
+    >
+      <div
+        className="w-full max-w-[340px] rounded-[32px] p-6 shadow-2xl space-y-4 text-center border border-[#ECE2D2]"
+        style={{ backgroundColor: DESIGN_TOKENS.colors.background }}
+      >
+        <div
+          className="w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl font-bold"
+          style={{
+            backgroundColor: DESIGN_TOKENS.colors.softPinkCard,
+            color: isError ? DESIGN_TOKENS.colors.errorRed : DESIGN_TOKENS.colors.accent,
+          }}
+        >
+          {isError ? '!' : '♡'}
+        </div>
+
+        <div className="space-y-1.5">
+          {title && (
+            <h3
+              className="text-[20px] font-bold tracking-tight"
+              style={{
+                fontFamily: DESIGN_TOKENS.typography.serif,
+                color: DESIGN_TOKENS.colors.text,
+              }}
+            >
+              {title}
+            </h3>
+          )}
+          <p
+            className="text-[14px] leading-relaxed opacity-90"
+            style={{
+              fontFamily: DESIGN_TOKENS.typography.sans,
+              color: DESIGN_TOKENS.colors.text,
+            }}
+          >
+            {message}
+          </p>
+        </div>
+
+        <div className="space-y-2.5 pt-2">
+          <Button variant="primary" onClick={onPrimaryClick}>
+            {primaryButtonText}
+          </Button>
+
+          {secondaryButtonText && onSecondaryClick && (
+            <Button variant="secondary" onClick={onSecondaryClick}>
+              {secondaryButtonText}
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function App() {
+  const [currentScreen, setCurrentScreen] = useState<Screen>('welcome');
+  const [lang, setLang] = useState<SupportedLanguage>('en');
+  const [activeTab, setActiveTab] = useState<TabType>('home');
+
+  // Input states
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [resetToken, setResetToken] = useState('expired');
+
+  // Allergies screen state
+  const [selectedAllergens, setSelectedAllergens] = useState<string[]>(['dairy']);
+  const [customIngredient, setCustomIngredient] = useState('');
+
+  // What to cook screen state
+  const [inputMode, setInputMode] = useState<'photo' | 'type' | 'voice'>('photo');
+  const [wtcQuickPrefs, setWtcQuickPrefs] = useState<string[]>(['protein']);
+
+  // Fit my macros state
+  const [macroChoice, setMacroChoice] = useState<'yes' | 'no'>('yes');
+
+  // Dessert screen state
+  const [dessertTags, setDessertTags] = useState<string[]>(['chocolate', 'sugarFree', 'highProtein']);
+
+  // Surprise me state
+  const [moodIndex, setMoodIndex] = useState<number>(0);
+
+  // Everyday meals state
+  const [mealType, setMealType] = useState<string>('dinner');
+  const [selectedFilters, setSelectedFilters] = useState<string[]>(['balanced']);
+
+  // Popup Dialog State
+  const [popup, setPopup] = useState<{
+    isOpen: boolean;
+    isError: boolean;
+    title?: string;
+    message: string;
+    primaryBtn: string;
+    onPrimary: () => void;
+    secondaryBtn?: string;
+    onSecondary?: () => void;
+  }>({
+    isOpen: false,
+    isError: false,
+    message: '',
+    primaryBtn: '',
+    onPrimary: () => {},
+  });
+
+  const t = translations[lang];
+
+  const navigateTo = (newScreen: Screen) => {
+    setCurrentScreen(newScreen);
+  };
+
+  const toggleLanguage = () => {
+    setLang((prev) => (prev === 'en' ? 'ru' : 'en'));
+  };
+
+  const handleLanguageSelect = (selectedLang: SupportedLanguage) => {
+    setLang(selectedLang);
+    navigateTo('signup');
+  };
+
+  const closePopup = () => {
+    setPopup((prev) => ({ ...prev, isOpen: false }));
+  };
+
+  const isValidEmail = (val: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim());
+
+  // Sign Up
+  const handleSignUp = () => {
+    if (!isValidEmail(email)) {
+      setPopup({
+        isOpen: true,
+        isError: true,
+        title: t.errors.noticeTitle,
+        message: t.errors.invalidEmail,
+        primaryBtn: t.errors.okBtn,
+        onPrimary: closePopup,
+      });
+      return;
+    }
+
+    if (email.trim().toLowerCase() === MOCK_EXISTING_USER.email) {
+      setPopup({
+        isOpen: true,
+        isError: true,
+        title: t.errors.noticeTitle,
+        message: t.errors.emailRegistered,
+        primaryBtn: t.errors.signInAction,
+        onPrimary: () => {
+          closePopup();
+          navigateTo('signin');
+        },
+        secondaryBtn: t.errors.okBtn,
+        onSecondary: closePopup,
+      });
+      return;
+    }
+
+    if (password.length < 8) {
+      setPopup({
+        isOpen: true,
+        isError: true,
+        title: t.errors.noticeTitle,
+        message: t.errors.shortPassword,
+        primaryBtn: t.errors.okBtn,
+        onPrimary: closePopup,
+      });
+      return;
+    }
+
+    navigateTo('allergies');
+  };
+
+  // Sign In
+  const handleSignIn = () => {
+    if (!isValidEmail(email)) {
+      setPopup({
+        isOpen: true,
+        isError: true,
+        title: t.errors.noticeTitle,
+        message: t.errors.invalidEmail,
+        primaryBtn: t.errors.okBtn,
+        onPrimary: closePopup,
+      });
+      return;
+    }
+
+    if (password.length < 8) {
+      setPopup({
+        isOpen: true,
+        isError: true,
+        title: t.errors.noticeTitle,
+        message: t.errors.shortPassword,
+        primaryBtn: t.errors.okBtn,
+        onPrimary: closePopup,
+      });
+      return;
+    }
+
+    if (
+      email.trim().toLowerCase() !== MOCK_EXISTING_USER.email ||
+      password !== MOCK_EXISTING_USER.password
+    ) {
+      setPopup({
+        isOpen: true,
+        isError: true,
+        title: t.errors.noticeTitle,
+        message: t.errors.wrongLogin,
+        primaryBtn: t.errors.okBtn,
+        onPrimary: closePopup,
+      });
+      return;
+    }
+
+    navigateTo('today');
+  };
+
+  // Password Reset
+  const handleVerifyResetLink = () => {
+    if (resetToken.trim().toLowerCase() === 'expired') {
+      setPopup({
+        isOpen: true,
+        isError: true,
+        title: t.errors.noticeTitle,
+        message: t.errors.expiredReset,
+        primaryBtn: t.errors.sendNewLinkAction,
+        onPrimary: () => {
+          setPopup({
+            isOpen: true,
+            isError: false,
+            title: t.modal.linkSentTitle,
+            message: t.modal.linkSentDesc,
+            primaryBtn: t.errors.okBtn,
+            onPrimary: closePopup,
+          });
+        },
+        secondaryBtn: t.errors.okBtn,
+        onSecondary: closePopup,
+      });
+      return;
+    }
+
+    navigateTo('signin');
+  };
+
+  const toggleAllergen = (key: string) => {
+    setSelectedAllergens((prev) =>
+      prev.includes(key) ? prev.filter((item) => item !== key) : [...prev, key]
+    );
+  };
+
+  const handleSavePreferences = () => {
+    const hasNoAllergies = selectedAllergens.length === 0 && customIngredient.trim() === '';
+
+    if (hasNoAllergies) {
+      setPopup({
+        isOpen: true,
+        isError: false,
+        message: t.allergies.noAllergiesPrompt,
+        primaryBtn: t.allergies.yesNoneBtn,
+        onPrimary: () => {
+          closePopup();
+          navigateTo('today');
+        },
+        secondaryBtn: t.allergies.goBackBtn,
+        onSecondary: closePopup,
+      });
+      return;
+    }
+
+    navigateTo('today');
+  };
+
+  const allergenList = [
+    { key: 'dairy', label: t.allergies.tags.dairy },
+    { key: 'gluten', label: t.allergies.tags.gluten },
+    { key: 'nuts', label: t.allergies.tags.nuts },
+    { key: 'eggs', label: t.allergies.tags.eggs },
+    { key: 'soy', label: t.allergies.tags.soy },
+    { key: 'fish', label: t.allergies.tags.fish },
+  ];
+
+  const toggleWtcPref = (key: string) => {
+    setWtcQuickPrefs((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
+  };
+
+  const toggleDessertTag = (key: string) => {
+    setDessertTags((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
+  };
+
+  const toggleMealFilter = (key: string) => {
+    setSelectedFilters((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
+  };
+
+  return (
+    <div
+      className="min-h-screen w-full flex justify-center items-center px-4 py-4"
       style={{
         backgroundColor: DESIGN_TOKENS.colors.background,
         color: DESIGN_TOKENS.colors.text,
         fontFamily: DESIGN_TOKENS.typography.sans,
       }}
     >
-      {/* Centered content column (mobile-sized card container without phone borders) */}
-      <main className="w-full max-w-[390px] min-h-[760px] flex flex-col justify-between mx-auto">
-        {/* Top Header */}
-        <header className="pt-2 pb-2 text-center">
-          <p
-            className="text-[14px] font-medium tracking-wide"
-            style={{
-              color: DESIGN_TOKENS.colors.accent,
-              fontFamily: DESIGN_TOKENS.typography.sans,
-            }}
-          >
-            {t.topHeader}
-          </p>
-        </header>
+      <main className="w-full max-w-[390px] min-h-[760px] flex flex-col justify-between mx-auto overflow-visible">
 
-        {/* Hero Image & Headline Area */}
-        <section className="flex-1 flex flex-col justify-center my-auto space-y-6">
-          {/* Meal Photo */}
-          <div className="relative w-full aspect-[1/0.92] rounded-[32px] overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.06)]">
-            <img
-              src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80"
-              alt={t.imageAlt}
-              className="w-full h-full object-cover"
+        {/* SCREEN 1: WELCOME */}
+        {currentScreen === 'welcome' && (
+          <div key="welcome" className="flex-1 flex flex-col justify-between">
+            <header className="pt-2 pb-2 text-center">
+              <p
+                className="text-[14px] font-medium tracking-wide"
+                style={{
+                  color: DESIGN_TOKENS.colors.accent,
+                  fontFamily: DESIGN_TOKENS.typography.sans,
+                }}
+              >
+                {t.welcome.topHeader}
+              </p>
+            </header>
+
+            <section className="flex-1 flex flex-col justify-center my-auto space-y-6">
+              <div className="relative w-full aspect-[1/0.92] rounded-[32px] overflow-hidden shadow-xs">
+                <img
+                  src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80"
+                  alt={t.welcome.imageAlt}
+                  className="w-full h-full object-cover"
+                />
+                <span className="absolute bottom-3 right-3 bg-black/45 backdrop-blur-xs text-white text-[11px] font-medium px-2.5 py-1 rounded-full tracking-wider">
+                  {t.welcome.badge}
+                </span>
+              </div>
+
+              <div className="space-y-3 px-1">
+                <h1
+                  className="text-[38px] leading-[1.12] font-bold tracking-tight whitespace-pre-line"
+                  style={{
+                    fontFamily: DESIGN_TOKENS.typography.serif,
+                    color: DESIGN_TOKENS.colors.text,
+                  }}
+                >
+                  {t.welcome.headline}
+                </h1>
+                <p
+                  className="text-[15px] leading-relaxed whitespace-pre-line opacity-85"
+                  style={{
+                    fontFamily: DESIGN_TOKENS.typography.sans,
+                    color: DESIGN_TOKENS.colors.text,
+                  }}
+                >
+                  {t.welcome.subtitle}
+                </p>
+              </div>
+            </section>
+
+            <footer className="pt-4 pb-2">
+              <div className="grid grid-cols-2 gap-3.5">
+                <Button
+                  variant="secondary"
+                  onClick={() => handleLanguageSelect('ru')}
+                >
+                  {t.welcome.russianBtn}
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={() => handleLanguageSelect('en')}
+                >
+                  {t.welcome.englishBtn}
+                </Button>
+              </div>
+            </footer>
+          </div>
+        )}
+
+        {/* SCREEN 2: SIGN UP */}
+        {currentScreen === 'signup' && (
+          <div key="signup" className="flex-1 flex flex-col justify-start">
+            <TopNavBar
+              title={t.nav.signupTitle}
+              lang={lang}
+              onBack={() => navigateTo('welcome')}
+              onToggleLang={toggleLanguage}
             />
-            <span className="absolute bottom-3 right-3 bg-black/45 backdrop-blur-sm text-white text-[11px] font-medium px-2.5 py-1 rounded-full tracking-wider">
-              {t.badge}
-            </span>
-          </div>
 
-          {/* Typography */}
-          <div className="space-y-3 px-1">
-            <h1
-              className="text-[38px] leading-[1.12] font-bold tracking-tight whitespace-pre-line"
-              style={{
-                fontFamily: DESIGN_TOKENS.typography.serif,
-                color: DESIGN_TOKENS.colors.text,
-              }}
-            >
-              {t.headline}
-            </h1>
-            <p
-              className="text-[15px] leading-relaxed whitespace-pre-line opacity-85"
-              style={{
-                fontFamily: DESIGN_TOKENS.typography.sans,
-                color: DESIGN_TOKENS.colors.text,
-              }}
-            >
-              {t.subtitle}
-            </p>
-          </div>
-        </section>
+            <div className="space-y-6 pt-4">
+              <div className="space-y-2">
+                <h1
+                  className="text-[36px] leading-[1.15] font-bold tracking-tight"
+                  style={{
+                    fontFamily: DESIGN_TOKENS.typography.serif,
+                    color: DESIGN_TOKENS.colors.text,
+                  }}
+                >
+                  {t.signup.title}
+                </h1>
+                <p
+                  className="text-[14px] leading-snug"
+                  style={{
+                    fontFamily: DESIGN_TOKENS.typography.sans,
+                    color: DESIGN_TOKENS.colors.textMuted,
+                  }}
+                >
+                  {t.signup.subtitle}
+                </p>
+              </div>
 
-        {/* Language Selection Buttons */}
-        <footer className="pt-4 pb-2">
-          <div className="grid grid-cols-2 gap-3.5">
-            <button
-              type="button"
-              onClick={() => setLang('ru')}
-              aria-label="Switch language to Russian"
-              className="min-h-[48px] px-5 py-2.5 rounded-2xl text-[15px] font-medium transition-all duration-200 outline-none flex items-center justify-center text-center shadow-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-offset-2"
-              style={{
-                backgroundColor:
-                  lang === 'ru'
-                    ? DESIGN_TOKENS.colors.primaryButton
-                    : '#FFFFFF',
-                color:
-                  lang === 'ru'
-                    ? '#FFFFFF'
-                    : DESIGN_TOKENS.colors.text,
-              }}
-            >
-              {t.russianBtn}
-            </button>
+              <div className="space-y-3.5 pt-1">
+                <Input
+                  label={t.signup.emailPlaceholder}
+                  type="text"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
 
-            <button
-              type="button"
-              onClick={() => setLang('en')}
-              aria-label="Switch language to English"
-              className="min-h-[48px] px-5 py-2.5 rounded-2xl text-[15px] font-medium transition-all duration-200 outline-none flex items-center justify-center text-center shadow-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-offset-2"
-              style={{
-                backgroundColor:
-                  lang === 'en'
-                    ? DESIGN_TOKENS.colors.primaryButton
-                    : '#FFFFFF',
-                color:
-                  lang === 'en'
-                    ? '#FFFFFF'
-                    : DESIGN_TOKENS.colors.text,
-              }}
-            >
-              {t.englishBtn}
-            </button>
+                <Input
+                  label={t.signup.passwordPlaceholder}
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+
+                <div className="pt-2">
+                  <Button variant="primary" onClick={handleSignUp}>
+                    {t.signup.submitBtn}
+                  </Button>
+                </div>
+
+                <div className="text-center pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('');
+                      setPassword('');
+                      navigateTo('signin');
+                    }}
+                    className="text-[13.5px] transition-opacity hover:opacity-80"
+                    style={{
+                      color: DESIGN_TOKENS.colors.textMuted,
+                      fontFamily: DESIGN_TOKENS.typography.sans,
+                    }}
+                  >
+                    {t.signup.alreadyRegistered}
+                  </button>
+                </div>
+              </div>
+
+              <p className="text-[11.5px] text-center text-[#474747]/50 italic">
+                {t.signup.demoHint}
+              </p>
+            </div>
           </div>
-        </footer>
+        )}
+
+        {/* SCREEN 3: SIGN IN */}
+        {currentScreen === 'signin' && (
+          <div key="signin" className="flex-1 flex flex-col justify-start">
+            <TopNavBar
+              title={t.nav.signinTitle}
+              lang={lang}
+              onBack={() => navigateTo('signup')}
+              onToggleLang={toggleLanguage}
+            />
+
+            <div className="space-y-6 pt-4">
+              <div className="space-y-2">
+                <h1
+                  className="text-[36px] leading-[1.15] font-bold tracking-tight"
+                  style={{
+                    fontFamily: DESIGN_TOKENS.typography.serif,
+                    color: DESIGN_TOKENS.colors.text,
+                  }}
+                >
+                  {t.signin.title}
+                </h1>
+                <p
+                  className="text-[14px] leading-snug"
+                  style={{
+                    fontFamily: DESIGN_TOKENS.typography.sans,
+                    color: DESIGN_TOKENS.colors.textMuted,
+                  }}
+                >
+                  {t.signin.subtitle}
+                </p>
+              </div>
+
+              <div className="space-y-3.5 pt-1">
+                <Input
+                  label={t.signin.emailPlaceholder}
+                  type="text"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+
+                <Input
+                  label={t.signin.passwordPlaceholder}
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+
+                <div className="pt-2">
+                  <Button variant="primary" onClick={handleSignIn}>
+                    {t.signin.submitBtn}
+                  </Button>
+                </div>
+
+                <div className="flex flex-col items-center gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('');
+                      setPassword('');
+                      navigateTo('signup');
+                    }}
+                    className="text-[13.5px] transition-opacity hover:opacity-80"
+                    style={{
+                      color: DESIGN_TOKENS.colors.textMuted,
+                      fontFamily: DESIGN_TOKENS.typography.sans,
+                    }}
+                  >
+                    {t.signin.noAccount}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => navigateTo('forgot')}
+                    className="text-[12.5px] underline transition-opacity hover:opacity-80"
+                    style={{
+                      color: DESIGN_TOKENS.colors.accent,
+                      fontFamily: DESIGN_TOKENS.typography.sans,
+                    }}
+                  >
+                    {t.signin.forgotPasswordLink}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* SCREEN 4: PASSWORD RESET */}
+        {currentScreen === 'forgot' && (
+          <div key="forgot" className="flex-1 flex flex-col justify-start">
+            <TopNavBar
+              title={t.nav.forgotTitle}
+              lang={lang}
+              onBack={() => navigateTo('signin')}
+              onToggleLang={toggleLanguage}
+            />
+
+            <div className="space-y-6 pt-4">
+              <div className="space-y-2">
+                <h1
+                  className="text-[34px] leading-[1.15] font-bold tracking-tight"
+                  style={{
+                    fontFamily: DESIGN_TOKENS.typography.serif,
+                    color: DESIGN_TOKENS.colors.text,
+                  }}
+                >
+                  {t.forgot.title}
+                </h1>
+                <p
+                  className="text-[14px] leading-snug"
+                  style={{
+                    fontFamily: DESIGN_TOKENS.typography.sans,
+                    color: DESIGN_TOKENS.colors.textMuted,
+                  }}
+                >
+                  {t.forgot.subtitle}
+                </p>
+              </div>
+
+              <div className="space-y-4 pt-1">
+                <Input
+                  label={t.forgot.linkInputPlaceholder}
+                  type="text"
+                  value={resetToken}
+                  onChange={(e) => setResetToken(e.target.value)}
+                />
+
+                <div className="pt-2">
+                  <Button variant="primary" onClick={handleVerifyResetLink}>
+                    {t.forgot.verifyBtn}
+                  </Button>
+                </div>
+
+                <p className="text-[12px] text-center text-[#474747]/60 italic pt-2">
+                  {t.forgot.testExpiredHint}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* SCREEN 5: ALLERGIES & EXCLUSIONS */}
+        {currentScreen === 'allergies' && (
+          <div key="allergies" className="flex-1 flex flex-col justify-between">
+            <div className="w-full text-left">
+              <TopNavBar
+                title={t.nav.allergiesTitle}
+                lang={lang}
+                onBack={() => navigateTo('signup')}
+                onToggleLang={toggleLanguage}
+              />
+
+              <div className="pt-3 space-y-2 text-left">
+                <h1
+                  className="text-[34px] font-bold leading-[1.12] tracking-tight whitespace-pre-line text-left"
+                  style={{
+                    fontFamily: DESIGN_TOKENS.typography.sans,
+                    color: DESIGN_TOKENS.colors.text,
+                  }}
+                >
+                  {t.allergies.headline}
+                </h1>
+                <p
+                  className="text-[13.5px] leading-relaxed text-left"
+                  style={{
+                    fontFamily: DESIGN_TOKENS.typography.sans,
+                    color: DESIGN_TOKENS.colors.textMuted,
+                  }}
+                >
+                  {t.allergies.subtitle}
+                </p>
+              </div>
+
+              {/* Tag selector */}
+              <div className="pt-6 flex flex-wrap gap-2.5 justify-start">
+                {allergenList.map(({ key, label }) => {
+                  const isSelected = selectedAllergens.includes(key);
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => toggleAllergen(key)}
+                      className={`min-h-[40px] px-4 py-2 rounded-full text-[13px] font-medium transition-all duration-150 active:scale-95 outline-none ${
+                        isSelected
+                          ? 'border border-[#E58B91] shadow-xs'
+                          : 'border border-[#E8DFC9] bg-white hover:bg-[#FAF6F0]'
+                      }`}
+                      style={{
+                        backgroundColor: isSelected
+                          ? DESIGN_TOKENS.colors.softPinkCard
+                          : DESIGN_TOKENS.colors.white,
+                        color: DESIGN_TOKENS.colors.text,
+                      }}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Custom Ingredient */}
+              <div className="pt-6">
+                <div className="w-full bg-white rounded-[24px] p-4 border border-[#ECE2D2] shadow-xs text-left">
+                  <label
+                    htmlFor="custom-ingredient"
+                    className="block text-[12.5px] font-semibold tracking-tight text-[#474747] text-left"
+                  >
+                    {t.allergies.customLabel}
+                  </label>
+                  <input
+                    id="custom-ingredient"
+                    type="text"
+                    value={customIngredient}
+                    onChange={(e) => setCustomIngredient(e.target.value)}
+                    placeholder={t.allergies.customPlaceholder}
+                    className="w-full bg-transparent outline-none text-[13.5px] text-[#474747] placeholder:text-[#A0A0A0] mt-1 text-left"
+                  />
+                </div>
+              </div>
+
+              {/* Sage Panel */}
+              <div className="pt-4">
+                <div
+                  className="w-full rounded-[24px] p-4 space-y-1 text-left"
+                  style={{ backgroundColor: DESIGN_TOKENS.colors.sagePanel }}
+                >
+                  <h3
+                    className="text-[13px] font-semibold text-left"
+                    style={{ color: DESIGN_TOKENS.colors.sageTextTitle }}
+                  >
+                    {t.allergies.sageTitle}
+                  </h3>
+                  <p
+                    className="text-[12.5px] leading-snug text-left"
+                    style={{ color: DESIGN_TOKENS.colors.sageTextBody }}
+                  >
+                    {t.allergies.sageDescription}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <footer className="pt-6 pb-2">
+              <Button variant="primary" onClick={handleSavePreferences}>
+                {t.allergies.saveBtn}
+              </Button>
+            </footer>
+          </div>
+        )}
+
+        {/* SCREEN 6: TODAY DASHBOARD */}
+        {currentScreen === 'today' && (
+          <div key="today" className="flex-1 flex flex-col justify-between">
+            <TopNavBar
+              title={t.nav.todayTitle}
+              lang={lang}
+              onToggleLang={toggleLanguage}
+            />
+
+            <div className="flex-1 overflow-y-auto space-y-5 pb-6 text-left">
+              <div className="space-y-1 pt-1">
+                <span
+                  className="text-[14px] font-medium block"
+                  style={{ color: DESIGN_TOKENS.colors.accent }}
+                >
+                  {t.today.greeting}
+                </span>
+                <h1
+                  className="text-[34px] leading-[1.12] font-bold tracking-tight"
+                  style={{
+                    fontFamily: DESIGN_TOKENS.typography.serif,
+                    color: DESIGN_TOKENS.colors.text,
+                  }}
+                >
+                  {t.today.headline}
+                </h1>
+                <p
+                  className="text-[13.5px] opacity-75"
+                  style={{
+                    fontFamily: DESIGN_TOKENS.typography.sans,
+                    color: DESIGN_TOKENS.colors.text,
+                  }}
+                >
+                  {t.today.subheadline}
+                </p>
+              </div>
+
+              {/* Category Grid */}
+              <div className="grid grid-cols-2 gap-3.5">
+                {/* 1. What to cook */}
+                <div
+                  onClick={() => navigateTo('whatToCook')}
+                  className="rounded-[28px] p-3 flex flex-col justify-between shadow-xs transition-transform active:scale-[0.98] cursor-pointer"
+                  style={{ backgroundColor: DESIGN_TOKENS.colors.sagePanel }}
+                >
+                  <div className="w-full aspect-[4/3] rounded-[20px] overflow-hidden mb-2.5 shadow-2xs">
+                    <img
+                      src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500&q=80"
+                      alt="Grain bowl"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h3
+                      className="text-[15px] font-bold tracking-tight leading-tight"
+                      style={{
+                        fontFamily: DESIGN_TOKENS.typography.serif,
+                        color: DESIGN_TOKENS.colors.text,
+                      }}
+                    >
+                      {t.today.cards.whatToCook}
+                    </h3>
+                    <p className="text-[11px] text-[#474747]/70 leading-snug mt-1">
+                      {t.today.cards.whatToCookDesc}
+                    </p>
+                  </div>
+                </div>
+
+                {/* 2. Fit my macros */}
+                <div
+                  onClick={() => navigateTo('fitMacros')}
+                  className="rounded-[28px] p-3 flex flex-col justify-between shadow-xs transition-transform active:scale-[0.98] cursor-pointer"
+                  style={{ backgroundColor: DESIGN_TOKENS.colors.softPinkCard }}
+                >
+                  <div className="w-full aspect-[4/3] rounded-[20px] overflow-hidden mb-2.5 shadow-2xs">
+                    <img
+                      src="https://images.unsplash.com/photo-1621996346565-e3d5d6281206?auto=format&fit=crop&w=500&q=80"
+                      alt="Pasta dish"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h3
+                      className="text-[15px] font-bold tracking-tight leading-tight"
+                      style={{
+                        fontFamily: DESIGN_TOKENS.typography.serif,
+                        color: DESIGN_TOKENS.colors.text,
+                      }}
+                    >
+                      {t.today.cards.fitMacros}
+                    </h3>
+                    <p className="text-[11px] text-[#474747]/70 leading-snug mt-1">
+                      {t.today.cards.fitMacrosDesc}
+                    </p>
+                  </div>
+                </div>
+
+                {/* 3. I want dessert */}
+                <div
+                  onClick={() => navigateTo('dessert')}
+                  className="rounded-[28px] p-3 flex flex-col justify-between shadow-xs transition-transform active:scale-[0.98] cursor-pointer"
+                  style={{ backgroundColor: DESIGN_TOKENS.colors.softPinkCard }}
+                >
+                  <div className="w-full aspect-[4/3] rounded-[20px] overflow-hidden mb-2.5 shadow-2xs">
+                    <img
+                      src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=500&q=80"
+                      alt="Chocolate cake"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h3
+                      className="text-[15px] font-bold tracking-tight leading-tight"
+                      style={{
+                        fontFamily: DESIGN_TOKENS.typography.serif,
+                        color: DESIGN_TOKENS.colors.text,
+                      }}
+                    >
+                      {t.today.cards.dessert}
+                    </h3>
+                    <p className="text-[11px] text-[#474747]/70 leading-snug mt-1">
+                      {t.today.cards.dessertDesc}
+                    </p>
+                  </div>
+                </div>
+
+                {/* 4. Surprise me */}
+                <div
+                  onClick={() => navigateTo('surprise')}
+                  className="rounded-[28px] p-3 flex flex-col justify-between shadow-xs transition-transform active:scale-[0.98] cursor-pointer"
+                  style={{ backgroundColor: DESIGN_TOKENS.colors.beigeCard }}
+                >
+                  <div className="w-full aspect-[4/3] rounded-[20px] overflow-hidden mb-2.5 shadow-2xs">
+                    <img
+                      src="https://images.unsplash.com/photo-1543339308-43e59d6b73a6?auto=format&fit=crop&w=500&q=80"
+                      alt="Rice bowl with veggies"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h3
+                      className="text-[15px] font-bold tracking-tight leading-tight"
+                      style={{
+                        fontFamily: DESIGN_TOKENS.typography.serif,
+                        color: DESIGN_TOKENS.colors.text,
+                      }}
+                    >
+                      {t.today.cards.surprise}
+                    </h3>
+                    <p className="text-[11px] text-[#474747]/70 leading-snug mt-1">
+                      {t.today.cards.surpriseDesc}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Wide Banner: Everyday meals */}
+              <div
+                onClick={() => navigateTo('everydayMeals')}
+                className="rounded-[26px] p-4 flex items-center justify-between cursor-pointer transition-transform active:scale-[0.99] shadow-xs"
+                style={{ backgroundColor: DESIGN_TOKENS.colors.sagePanel }}
+              >
+                <div className="space-y-0.5">
+                  <h4
+                    className="text-[15px] font-bold"
+                    style={{ color: DESIGN_TOKENS.colors.text }}
+                  >
+                    {t.today.banner.title}
+                  </h4>
+                  <p className="text-[12px] text-[#474747]/75">
+                    {t.today.banner.subtitle}
+                  </p>
+                </div>
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-lg"
+                  style={{ color: DESIGN_TOKENS.colors.accent }}
+                >
+                  →
+                </div>
+              </div>
+
+              {/* Bottom Quick Cards */}
+              <div className="grid grid-cols-2 gap-3.5 pt-1">
+                <div className="rounded-[24px] p-4 bg-white border border-[#EFE5D8] shadow-2xs cursor-pointer">
+                  <h5 className="text-[13px] font-bold text-[#474747]">
+                    {t.today.bottomCards.worthKnowing}
+                  </h5>
+                  <p className="text-[11px] text-[#474747]/70 mt-0.5">
+                    {t.today.bottomCards.worthKnowingSub}
+                  </p>
+                </div>
+
+                <div
+                  className="rounded-[24px] p-4 shadow-2xs cursor-pointer"
+                  style={{ backgroundColor: DESIGN_TOKENS.colors.softPinkCard }}
+                >
+                  <h5 className="text-[13px] font-bold text-[#474747]">
+                    {t.today.bottomCards.proRecipes}
+                  </h5>
+                  <p className="text-[11px] text-[#474747]/70 mt-0.5">
+                    {t.today.bottomCards.proRecipesSub}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom App Nav */}
+            <nav className="w-full pt-3 pb-1 border-t border-[#EAE1D3] flex items-center justify-around select-none">
+              <button
+                type="button"
+                onClick={() => setActiveTab('home')}
+                className="flex flex-col items-center gap-1 transition-transform active:scale-90"
+                style={{
+                  color:
+                    activeTab === 'home'
+                      ? DESIGN_TOKENS.colors.primaryButton
+                      : DESIGN_TOKENS.colors.textMuted,
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                </svg>
+                <span className="text-[11px] font-medium">{t.today.tabs.home}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('favorites')}
+                className="flex flex-col items-center gap-1 transition-transform active:scale-90"
+                style={{
+                  color:
+                    activeTab === 'favorites'
+                      ? DESIGN_TOKENS.colors.primaryButton
+                      : DESIGN_TOKENS.colors.textMuted,
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg>
+                <span className="text-[11px] font-medium">{t.today.tabs.favorites}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('history')}
+                className="flex flex-col items-center gap-1 transition-transform active:scale-90"
+                style={{
+                  color:
+                    activeTab === 'history'
+                      ? DESIGN_TOKENS.colors.primaryButton
+                      : DESIGN_TOKENS.colors.textMuted,
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <span className="text-[11px] font-medium">{t.today.tabs.history}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('me')}
+                className="flex flex-col items-center gap-1 transition-transform active:scale-90"
+                style={{
+                  color:
+                    activeTab === 'me'
+                      ? DESIGN_TOKENS.colors.primaryButton
+                      : DESIGN_TOKENS.colors.textMuted,
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+                <span className="text-[11px] font-medium">{t.today.tabs.me}</span>
+              </button>
+            </nav>
+          </div>
+        )}
+
+        {/* SCREEN 7: WHAT TO COOK */}
+        {currentScreen === 'whatToCook' && (
+          <div key="whatToCook" className="flex-1 flex flex-col justify-between">
+            <div className="w-full text-left space-y-5">
+              <TopNavBar
+                title={t.nav.whatToCookTitle}
+                lang={lang}
+                onBack={() => navigateTo('today')}
+                onHome={() => navigateTo('today')}
+                onToggleLang={toggleLanguage}
+              />
+
+              <div className="space-y-1.5">
+                <h1
+                  className="text-[34px] font-bold leading-[1.12] tracking-tight"
+                  style={{
+                    fontFamily: DESIGN_TOKENS.typography.serif,
+                    color: DESIGN_TOKENS.colors.text,
+                  }}
+                >
+                  {t.whatToCook.headline}
+                </h1>
+                <p className="text-[13.5px] opacity-75 leading-relaxed">
+                  {t.whatToCook.subtitle}
+                </p>
+              </div>
+
+              {/* Mode Switcher Card */}
+              <div className="bg-white rounded-[26px] p-3 shadow-xs border border-[#ECE2D2] space-y-3">
+                <div className="grid grid-cols-3 gap-2">
+                  {(['photo', 'type', 'voice'] as const).map((mode) => {
+                    const isSelected = inputMode === mode;
+                    return (
+                      <button
+                        key={mode}
+                        type="button"
+                        onClick={() => setInputMode(mode)}
+                        className={`py-2 rounded-[16px] text-[13px] font-medium transition-all ${
+                          isSelected
+                            ? 'border border-[#E58B91]'
+                            : 'bg-white border border-[#EFE5D8]'
+                        }`}
+                        style={{
+                          backgroundColor: isSelected
+                            ? DESIGN_TOKENS.colors.softPinkCard
+                            : DESIGN_TOKENS.colors.white,
+                          color: DESIGN_TOKENS.colors.text,
+                        }}
+                      >
+                        {t.whatToCook.tabs[mode]}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Photo Target Panel */}
+                <div
+                  className="rounded-[20px] p-6 text-center space-y-2 border border-dashed border-[#D6DFCF]"
+                  style={{ backgroundColor: DESIGN_TOKENS.colors.sagePanel }}
+                >
+                  <div className="w-10 h-10 rounded-full border-2 border-[#DE8B87] flex items-center justify-center mx-auto">
+                    <div className="w-3.5 h-3.5 rounded-full bg-[#DE8B87]" />
+                  </div>
+                  <div>
+                    <h4 className="text-[14px] font-bold text-[#474747]">
+                      {t.whatToCook.photoCard.title}
+                    </h4>
+                    <p className="text-[11.5px] text-[#474747]/70 mt-0.5">
+                      {t.whatToCook.photoCard.desc}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Leftovers Banner */}
+              <div
+                className="rounded-[24px] p-3.5 flex items-center justify-between shadow-xs cursor-pointer"
+                style={{ backgroundColor: DESIGN_TOKENS.colors.sagePanel }}
+              >
+                <div className="pr-3">
+                  <h4 className="text-[13.5px] font-bold text-[#474747]">
+                    {t.whatToCook.leftoversCard.title}
+                  </h4>
+                  <p className="text-[11px] text-[#474747]/70 mt-0.5">
+                    {t.whatToCook.leftoversCard.desc}
+                  </p>
+                </div>
+                <div className="w-14 h-14 rounded-[16px] overflow-hidden shrink-0 shadow-2xs">
+                  <img
+                    src="https://images.unsplash.com/photo-1543339308-43e59d6b73a6?auto=format&fit=crop&w=200&q=80"
+                    alt="Leftovers dish"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+
+              {/* Quick Preferences */}
+              <div className="space-y-2">
+                <p className="text-[12px] font-semibold text-[#474747]/80">
+                  {t.whatToCook.quickPreferences}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { key: 'protein', label: t.whatToCook.tags.protein },
+                    { key: 'upTo15', label: t.whatToCook.tags.upTo15 },
+                    { key: 'dairyFree', label: t.whatToCook.tags.dairyFree },
+                  ].map(({ key, label }) => {
+                    const isSelected = wtcQuickPrefs.includes(key);
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => toggleWtcPref(key)}
+                        className={`px-4 py-2 rounded-full text-[12.5px] font-medium transition-all ${
+                          isSelected
+                            ? 'border border-[#E58B91] shadow-2xs'
+                            : 'border border-[#E8DFC9] bg-white'
+                        }`}
+                        style={{
+                          backgroundColor: isSelected
+                            ? DESIGN_TOKENS.colors.softPinkCard
+                            : DESIGN_TOKENS.colors.white,
+                          color: DESIGN_TOKENS.colors.text,
+                        }}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <footer className="pt-5 pb-2 text-center space-y-2">
+              <Button variant="primary">
+                {t.whatToCook.nextBtn}
+              </Button>
+              <p className="text-[11px] text-[#474747]/60">
+                {t.whatToCook.footnote}
+              </p>
+            </footer>
+          </div>
+        )}
+
+        {/* SCREEN 8: FIT MY MACROS */}
+        {currentScreen === 'fitMacros' && (
+          <div key="fitMacros" className="flex-1 flex flex-col justify-between">
+            <div className="w-full text-left space-y-5">
+              <TopNavBar
+                title={t.nav.fitMacrosTitle}
+                lang={lang}
+                onBack={() => navigateTo('today')}
+                onHome={() => navigateTo('today')}
+                onToggleLang={toggleLanguage}
+              />
+
+              <div className="space-y-1.5">
+                <h1
+                  className="text-[34px] font-bold leading-[1.12] tracking-tight"
+                  style={{
+                    fontFamily: DESIGN_TOKENS.typography.serif,
+                    color: DESIGN_TOKENS.colors.text,
+                  }}
+                >
+                  {t.fitMacros.headline}
+                </h1>
+                <p className="text-[13.5px] opacity-75 leading-relaxed">
+                  {t.fitMacros.subtitle}
+                </p>
+              </div>
+
+              {/* 2 Target Options */}
+              <div className="space-y-3 pt-2">
+                <div
+                  onClick={() => setMacroChoice('yes')}
+                  className={`rounded-[24px] p-4 flex items-start gap-3 cursor-pointer transition-all border ${
+                    macroChoice === 'yes'
+                      ? 'border-[#C2D6B8] shadow-xs'
+                      : 'border-[#ECE2D2] bg-white'
+                  }`}
+                  style={{
+                    backgroundColor:
+                      macroChoice === 'yes'
+                        ? DESIGN_TOKENS.colors.sagePanel
+                        : DESIGN_TOKENS.colors.white,
+                  }}
+                >
+                  <span className="text-[15px] text-[#474747] font-bold mt-0.5">✓</span>
+                  <div>
+                    <h4 className="text-[14px] font-bold text-[#474747]">
+                      {t.fitMacros.option1.title}
+                    </h4>
+                    <p className="text-[12px] text-[#474747]/70 mt-0.5">
+                      {t.fitMacros.option1.desc}
+                    </p>
+                  </div>
+                </div>
+
+                <div
+                  onClick={() => setMacroChoice('no')}
+                  className={`rounded-[24px] p-4 flex items-start gap-3 cursor-pointer transition-all border ${
+                    macroChoice === 'no'
+                      ? 'border-[#E58B91] shadow-xs bg-[#FFF]'
+                      : 'border-[#ECE2D2] bg-white'
+                  }`}
+                  style={{
+                    backgroundColor:
+                      macroChoice === 'no'
+                        ? DESIGN_TOKENS.colors.softPinkCard
+                        : DESIGN_TOKENS.colors.white,
+                  }}
+                >
+                  <span className="text-[14px] text-[#474747] mt-0.5">✦</span>
+                  <div>
+                    <h4 className="text-[14px] font-bold text-[#474747]">
+                      {t.fitMacros.option2.title}
+                    </h4>
+                    <p className="text-[12px] text-[#474747]/70 mt-0.5">
+                      {t.fitMacros.option2.desc}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <footer className="pt-6 pb-2">
+              <Button variant="primary" onClick={() => navigateTo('today')}>
+                {t.fitMacros.continueBtn}
+              </Button>
+            </footer>
+          </div>
+        )}
+
+        {/* SCREEN 9: I WANT DESSERT */}
+        {currentScreen === 'dessert' && (
+          <div key="dessert" className="flex-1 flex flex-col justify-between">
+            <div className="w-full text-left space-y-4">
+              <TopNavBar
+                title={t.nav.dessertTitle}
+                lang={lang}
+                onBack={() => navigateTo('today')}
+                onHome={() => navigateTo('today')}
+                onToggleLang={toggleLanguage}
+              />
+
+              <div className="space-y-1">
+                <h1
+                  className="text-[34px] font-bold leading-[1.12] tracking-tight"
+                  style={{
+                    fontFamily: DESIGN_TOKENS.typography.serif,
+                    color: DESIGN_TOKENS.colors.text,
+                  }}
+                >
+                  {t.dessert.headline}
+                </h1>
+                <p className="text-[13.5px] opacity-75">
+                  {t.dessert.subtitle}
+                </p>
+              </div>
+
+              {/* Dessert Hero Image */}
+              <div className="relative w-full aspect-[16/9] rounded-[28px] overflow-hidden shadow-xs">
+                <img
+                  src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=800&q=80"
+                  alt="Dessert preview"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 flex items-center justify-center gap-3">
+                  <span className="text-3xl drop-shadow-md">🍫</span>
+                  <span className="text-3xl drop-shadow-md">🍓</span>
+                </div>
+              </div>
+
+              {/* Dessert Tags */}
+              <div className="grid grid-cols-3 gap-2 pt-1">
+                {[
+                  { key: 'chocolate', label: t.dessert.tags.chocolate },
+                  { key: 'withBerries', label: t.dessert.tags.withBerries },
+                  { key: 'sugarFree', label: t.dessert.tags.sugarFree },
+                  { key: 'dairyFree', label: t.dessert.tags.dairyFree },
+                  { key: 'highProtein', label: t.dessert.tags.highProtein },
+                  { key: 'upTo250', label: t.dessert.tags.upTo250 },
+                ].map(({ key, label }) => {
+                  const isSelected = dessertTags.includes(key);
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => toggleDessertTag(key)}
+                      className={`min-h-[42px] px-2 py-2 rounded-[18px] text-[12px] font-medium transition-all ${
+                        isSelected
+                          ? 'border border-[#E58B91] shadow-2xs'
+                          : 'border border-[#E8DFC9] bg-white'
+                      }`}
+                      style={{
+                        backgroundColor: isSelected
+                          ? DESIGN_TOKENS.colors.softPinkCard
+                          : DESIGN_TOKENS.colors.white,
+                        color: DESIGN_TOKENS.colors.text,
+                      }}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <footer className="pt-6 pb-2">
+              <Button variant="primary" onClick={() => navigateTo('today')}>
+                {t.dessert.showBtn}
+              </Button>
+            </footer>
+          </div>
+        )}
+
+        {/* SCREEN 10: SURPRISE ME */}
+        {currentScreen === 'surprise' && (
+          <div key="surprise" className="flex-1 flex flex-col justify-between">
+            <div className="w-full text-left space-y-5">
+              <TopNavBar
+                title={t.nav.surpriseTitle}
+                lang={lang}
+                onBack={() => navigateTo('today')}
+                onHome={() => navigateTo('today')}
+                onToggleLang={toggleLanguage}
+              />
+
+              <div className="space-y-1.5">
+                <h1
+                  className="text-[34px] font-bold leading-[1.12] tracking-tight"
+                  style={{
+                    fontFamily: DESIGN_TOKENS.typography.serif,
+                    color: DESIGN_TOKENS.colors.text,
+                  }}
+                >
+                  {t.surprise.headline}
+                </h1>
+                <p className="text-[13.5px] opacity-75 leading-relaxed">
+                  {t.surprise.subtitle}
+                </p>
+              </div>
+
+              {/* Mood List */}
+              <div className="space-y-3 pt-2">
+                {t.surprise.options.map((option, idx) => {
+                  const isSelected = moodIndex === idx;
+                  return (
+                    <div
+                      key={option}
+                      onClick={() => setMoodIndex(idx)}
+                      className={`w-full min-h-[54px] px-5 py-3.5 rounded-[22px] flex items-center justify-start text-[14px] font-medium cursor-pointer transition-all border ${
+                        isSelected
+                          ? 'border-[#E58B91] shadow-xs'
+                          : 'border-[#ECE2D2] bg-white'
+                      }`}
+                      style={{
+                        backgroundColor: isSelected
+                          ? DESIGN_TOKENS.colors.softPinkCard
+                          : DESIGN_TOKENS.colors.white,
+                        color: DESIGN_TOKENS.colors.text,
+                      }}
+                    >
+                      {option}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <footer className="pt-6 pb-2">
+              <Button variant="primary" onClick={() => navigateTo('today')}>
+                {t.surprise.surpriseBtn}
+              </Button>
+            </footer>
+          </div>
+        )}
+
+        {/* SCREEN 11: EVERYDAY MEALS */}
+        {currentScreen === 'everydayMeals' && (
+          <div key="everydayMeals" className="flex-1 flex flex-col justify-between">
+            <div className="w-full text-left space-y-5">
+              <TopNavBar
+                title={t.nav.everydayMealsTitle}
+                lang={lang}
+                onBack={() => navigateTo('today')}
+                onHome={() => navigateTo('today')}
+                onToggleLang={toggleLanguage}
+              />
+
+              <div className="space-y-1.5">
+                <h1
+                  className="text-[34px] font-bold leading-[1.12] tracking-tight"
+                  style={{
+                    fontFamily: DESIGN_TOKENS.typography.serif,
+                    color: DESIGN_TOKENS.colors.text,
+                  }}
+                >
+                  {t.everydayMeals.headline}
+                </h1>
+                <p className="text-[13.5px] opacity-75 leading-relaxed">
+                  {t.everydayMeals.subtitle}
+                </p>
+              </div>
+
+              {/* Meal Pills */}
+              <div className="flex flex-wrap gap-2">
+                {(['breakfast', 'lunch', 'dinner', 'snack'] as const).map((meal) => {
+                  const isSelected = mealType === meal;
+                  return (
+                    <button
+                      key={meal}
+                      type="button"
+                      onClick={() => setMealType(meal)}
+                      className={`px-4 py-2 rounded-full text-[13px] font-medium transition-all ${
+                        isSelected
+                          ? 'border border-[#E58B91] shadow-2xs'
+                          : 'border border-[#E8DFC9] bg-white'
+                      }`}
+                      style={{
+                        backgroundColor: isSelected
+                          ? DESIGN_TOKENS.colors.softPinkCard
+                          : DESIGN_TOKENS.colors.white,
+                        color: DESIGN_TOKENS.colors.text,
+                      }}
+                    >
+                      {t.everydayMeals.meals[meal]}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Filters */}
+              <div className="space-y-3 pt-1">
+                {[
+                  { key: 'balanced', label: t.everydayMeals.filters.balanced },
+                  { key: 'quick', label: t.everydayMeals.filters.quick },
+                  { key: 'family', label: t.everydayMeals.filters.family },
+                ].map(({ key, label }) => {
+                  const isSelected = selectedFilters.includes(key);
+                  return (
+                    <div
+                      key={key}
+                      onClick={() => toggleMealFilter(key)}
+                      className={`w-full min-h-[52px] px-5 py-3 rounded-[22px] flex items-center justify-start text-[14px] font-medium cursor-pointer transition-all border ${
+                        isSelected
+                          ? 'border-[#E58B91] shadow-xs'
+                          : 'border-[#ECE2D2] bg-white'
+                      }`}
+                      style={{
+                        backgroundColor: isSelected
+                          ? DESIGN_TOKENS.colors.softPinkCard
+                          : DESIGN_TOKENS.colors.white,
+                        color: DESIGN_TOKENS.colors.text,
+                      }}
+                    >
+                      {label}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <footer className="pt-6 pb-2">
+              <Button variant="primary" onClick={() => navigateTo('today')}>
+                {t.everydayMeals.showBtn}
+              </Button>
+            </footer>
+          </div>
+        )}
       </main>
+
+      {/* Styled Popup Dialog */}
+      <ThemedPopup
+        isOpen={popup.isOpen}
+        isError={popup.isError}
+        title={popup.title}
+        message={popup.message}
+        primaryButtonText={popup.primaryBtn}
+        onPrimaryClick={popup.onPrimary}
+        secondaryButtonText={popup.secondaryBtn}
+        onSecondaryClick={popup.onSecondary}
+      />
     </div>
   );
 }
